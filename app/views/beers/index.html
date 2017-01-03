@@ -1,0 +1,49 @@
+<div class="jumbotron">
+  <h1 class="display-3">Search for a beer</h1>
+  <form class="form-inline" id="beer" action="/search">
+    <div class="form-group">
+      <input type="text" class="form-control" id="search" name="search" placeholder="Search by name">
+      <button type="submit" class="btn btn-success">Go!</search>
+    </div>
+  </form>
+
+  <i class="fa fa-spinner fa-spin hidden" aria-hidden="true"></i>
+
+  <div class="list-group" id="items"></div>
+
+  <script id="template" type="x-tmpl-mustache">
+    <a href="{{link}}" class="list-group-item list-group-item-action">
+      <img src="{{ label }}" alt="{{ name }}" />
+      <h5 class="list-group-item-heading">{{ name }}</h5>
+      <p class="list-group-item-text">{{ description }}</p>
+    </a>
+  </script>
+
+  <script>
+    $(function(){
+      $('#beer').submit(function(event) {
+        var items = $('#items')
+        var search = $("#search").val()
+        var spinner = $('.fa-spinner')
+        
+        spinner.removeClass('hidden')
+        items.html('')
+        $.post('/beers/search', { search: search} , function(data) {
+          spinner.addClass('hidden')
+          $.each(data, function( index, result ) {
+            var template = $('#template').html()
+            Mustache.parse(template);
+            var beer = Mustache.render(template, {
+              link: "/",
+              label: result.label,
+              name: result.name,
+              description: result.description
+            });
+            items.append(beer)
+          })
+        })
+        event.preventDefault();
+      })
+    })
+  </script>
+</div>
